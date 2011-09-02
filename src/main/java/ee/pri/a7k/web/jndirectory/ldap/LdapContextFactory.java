@@ -18,11 +18,13 @@ public class LdapContextFactory {
 
     static {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://localhost:389/dc=teepub");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=teepub");
-        env.put(Context.SECURITY_CREDENTIALS, "admin");
         env.put("com.sun.jndi.ldap.connect.pool", "true");
+        
+        env.put(Context.PROVIDER_URL, "ldap://localhost:389/dc=example,dc=com");
+        
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=example,dc=com");
+        env.put(Context.SECURITY_CREDENTIALS, "admin");
     }
 
     protected static LdapContext getContext() throws NamingException {
