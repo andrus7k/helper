@@ -4,35 +4,44 @@
  */
 package ee.pri.a7k.web.jndirectory.ldap;
 
-import java.util.Hashtable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
 public class LdapContextFactory {
 
-    private static final Hashtable<String, String> env = new Hashtable<String, String>();
+    private final Properties env = new Properties();
+    private static LdapContextFactory ldapCtxFactory = null;
 
-    static {
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put("com.sun.jndi.ldap.connect.pool", "true");
-        
-        env.put(Context.PROVIDER_URL, "ldap://localhost:389/dc=example,dc=com");
-        
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=example,dc=com");
-        env.put(Context.SECURITY_CREDENTIALS, "admin");
-    }
+    private LdapContextFactory() throws IOException {
 
-    protected static LdapContext getContext() throws NamingException {
         try {
-            return new InitialLdapContext();
-        } catch (NamingException ex) {
-            Logger.getLogger(LdapContextFactory.class.getName()).log(Level.SEVERE, "Failed creating context", ex);
+            InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("jndi.properties");
+            env.load(resourceAsStream);
+
+        } catch (IOException ex) {
+            Logger.getLogger(LdapContextFactory.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
         }
+    }
+
+    private LdapContext get() throws NamingException {
+        final InitialLdapContext initialDirContext = new InitialLdapContext(env, null);
+        if (initialDirContext instanceof LdapContext) {
+            return (LdapContext) initialDirContext;
+        }
+        return null;
+    }
+
+    public static LdapContext getContext() throws NamingException, IOException {
+        if (ldapCtxFactory == null) {
+            ldapCtxFactory = new LdapContextFactory();
+        }
+        return ldapCtxFactory.get();
     }
 }

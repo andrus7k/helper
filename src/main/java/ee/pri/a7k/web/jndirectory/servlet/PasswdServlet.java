@@ -115,6 +115,9 @@ public class PasswdServlet extends HttpServlet {
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(PasswdServlet.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException("Internal server error", ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PasswdServlet.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException("Internal server error", ex);
         }
 
     }

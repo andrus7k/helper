@@ -4,6 +4,7 @@
  */
 package ee.pri.a7k.web.jndirectory.ldap;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,7 +29,7 @@ public class LdapCtxClient {
     private final static Logger LOGGER = Logger.getLogger(LdapCtxClient.class.getName());
     private final LdapContext lctx;
 
-    public LdapCtxClient() throws NamingException {
+    public LdapCtxClient() throws NamingException, IOException {
         lctx = LdapContextFactory.getContext();
     }
 
