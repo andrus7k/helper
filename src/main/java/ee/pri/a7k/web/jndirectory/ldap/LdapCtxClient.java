@@ -42,7 +42,7 @@ public class LdapCtxClient {
         sc.setReturningAttributes(attributeFilter);
 
         NamingEnumeration results = lctx.search("ou=People",
-                "(&(objectClass=uidObject)(objectClass=sipleSecurityObject)(uid=" + uid + ")(userPassword=" + hashPassword(pass) + "))", sc);
+                "(&(objectClass=uidObject)(objectClass=simpleSecurityObject)(uid=" + uid + ")(userPassword=" + hashPassword(pass) + "))", sc);
 
         while (results.hasMore()) {
             SearchResult sr = (SearchResult) results.next();

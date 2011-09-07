@@ -42,22 +42,24 @@ public class PasswdServlet extends HttpServlet {
             throws ServletException, IOException {
 
 
-        String uid = parseUid(request.getParameterValues("uid"));
-        if (uid == null || uid.trim().isEmpty()) {
-            throw new IllegalArgumentException("Empty username");
-        }
-
-        String pass = parsePass(request.getParameterValues("pass"));
-        if (pass == null || pass.trim().isEmpty()) {
-            throw new IllegalArgumentException("Could not authenticate user '" + uid + "'");
-        }
-
-        String newpass = parseNewPasswdParams(request.getParameterValues("newpass"));
-        if (newpass == null || newpass.trim().isEmpty()) {
-            throw new IllegalArgumentException("New passwords don't match or are empty");
-        }
 
         try {
+
+            String uid = parseUid(request.getParameterValues("uid"));
+            if (uid == null || uid.trim().isEmpty()) {
+                throw new IllegalArgumentException("Empty username");
+            }
+
+            String pass = parsePass(request.getParameterValues("pass"));
+            if (pass == null || pass.trim().isEmpty()) {
+                throw new IllegalArgumentException("Could not authenticate user '" + uid + "'");
+            }
+
+            String newpass = parseNewPasswdParams(request.getParameterValues("newpass"));
+            if (newpass == null || newpass.trim().isEmpty()) {
+                throw new IllegalArgumentException("New passwords don't match or are empty");
+            }
+
             updateUserPassword(uid, pass, newpass);
             writeResponse(response, request, uid);
         } catch (IllegalArgumentException iae) {

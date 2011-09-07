@@ -3,7 +3,7 @@
     <display-name>Archetype Created Web Application</display-name>
     <servlet>
         <servlet-name>PasswdServlet</servlet-name>
-        <servlet-class>ee.pri.a7k.web.jnDirectory.servlet.PasswdServlet</servlet-class>
+        <servlet-class>ee.pri.a7k.web.jndirectory.servlet.PasswdServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>PasswdServlet</servlet-name>
