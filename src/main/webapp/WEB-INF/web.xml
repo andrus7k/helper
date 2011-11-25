@@ -12,4 +12,8 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+    <resource-env-ref>
+        <resource-env-ref-name>Ldap</resource-env-ref-name>
+        <resource-env-ref-type>javax.naming.ldap.LdapContext</resource-env-ref-type>
+    </resource-env-ref>
 </web-app>

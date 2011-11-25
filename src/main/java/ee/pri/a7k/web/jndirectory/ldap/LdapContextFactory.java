@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
@@ -31,11 +33,13 @@ public class LdapContextFactory {
     }
 
     private LdapContext get() throws NamingException {
+        Context context = new InitialContext();
+        Context envCtx = (Context) context.lookup("java:comp/env");
+        LdapContext lctx = (LdapContext) envCtx.lookup("Ldap");
+
         final InitialLdapContext initialDirContext = new InitialLdapContext(env, null);
-        if (initialDirContext instanceof LdapContext) {
-            return (LdapContext) initialDirContext;
-        }
-        return null;
+
+        return initialDirContext;
     }
 
     public static LdapContext getContext() throws NamingException, IOException {
