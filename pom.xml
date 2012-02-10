@@ -66,5 +66,10 @@
             <version>2.5</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jvnet.hudson.winstone</groupId>
+            <artifactId>winstone</artifactId>
+            <version>0.9.10-hudson-24</version>
+        </dependency>
     </dependencies>
 </project>
