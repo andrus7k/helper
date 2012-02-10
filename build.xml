@@ -29,7 +29,7 @@
     </target>
 
     <target name="run">
-        <java jar="build/war/lib/${ant.project.name}.jar" fork="true"/>
+        <java jar="build/war/lib/${ant.project.name}.jar" fork="true" classpathref="classpath" args="--webroot=build/war --ajp13Port=-1  --httpPort=8880"/>
     </target>
 
 
