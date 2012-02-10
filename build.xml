@@ -1,5 +1,36 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="hello-ivy" default="resolve">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="jnDirectory" default="jar">
+
+    <property name="lib.dir"     value="lib"/>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
     <target name="resolve" description="--> retrieve dependencies with ivy">
         <ivy:retrieve />
     </target>
+
+    <target name="compile" depends="resolve">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" classpathref="classpath"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/war/lib/${ant.project.name}.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="winstone.Launcher"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="build/war/lib/${ant.project.name}.jar" fork="true"/>
+    </target>
+
+
 </project>
