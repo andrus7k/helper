@@ -18,17 +18,21 @@
 		<delete dir="${lib.dir}" />
 	</target>
 
-	<target name="resolve" description="--> retrieve dependencies with ivy">
-	</target>
-
-	<target name="compile" depends="resolve">
+	<target name="compile">
 		<ivy:retrieve conf="compile" sync="true"/>
 		<mkdir dir="${classes}" />
 		<javac srcdir="${src.dir}" destdir="${classes}" classpathref="classpath" />
 	</target>
 
-	<target name="war" depends="compile">
-		<ivy:retrieve conf="war"  sync="true"/>
+	<target name="compile-tests" depends="compile">
+		<ivy:retrieve conf="test" sync="true"/>
+	</target>
+
+	<target name="test" depends="compile-tests">
+	</target>
+
+	<target name="war" depends="test">
+		<ivy:retrieve conf="runtime"  sync="true"/>
 		<war destfile="${build.dir}/${ant.project.name}.war" webxml="${war.dir}/WEB-INF/web.xml">
 			<lib dir="${lib.dir}" erroronmissingdir="false"/>
 			<classes dir="${classes}" />
@@ -37,8 +41,12 @@
 
 	<target name="standalone" depends="war">
 		<ivy:retrieve conf="standalone" pattern="${lib.dir}/[artifact].[ext]" sync="true"/>
-		<copy file="${lib.dir}/winstone.jar" tofile="${build.dir}/${ant.project.name}-standalone.jar"/>
+		<!--copy file="${lib.dir}/winstone.jar" tofile="${build.dir}/${ant.project.name}-standalone.jar"/>
 		<jar destfile="${build.dir}/${ant.project.name}-standalone.jar" update="true">
+			<zipfileset dir="." includes="${build.dir}/${ant.project.name}.war" fullpath="embedded.war"/>
+		</jar-->
+		<jar destfile="${build.dir}/${ant.project.name}-standalone.jar" update="no" filesetmanifest="merge">
+			<zipfileset includes="**/*.*" src="${lib.dir}/winstone.jar"/>
 			<zipfileset dir="." includes="${build.dir}/${ant.project.name}.war" fullpath="embedded.war"/>
 		</jar>
 	</target>
