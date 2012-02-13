@@ -1,5 +1,5 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="jnDirectory"
-	default="war">
+	default="standalone">
 
 	<property name="src.dir" value="src" />
 	<property name="war.dir" value="war" />
