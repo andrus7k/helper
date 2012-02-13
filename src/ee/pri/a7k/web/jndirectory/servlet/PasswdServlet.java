@@ -21,136 +21,143 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * 
  * @author andrus
  */
 public class PasswdServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = Logger.getLogger(PasswdServlet.class.getName());
+	private static final Logger logger = Logger.getLogger(PasswdServlet.class
+			.getName());
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-    }
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+	}
 
-    @Override
-    public String getServletInfo() {
-        return getClass().getCanonicalName();
-    }
+	@Override
+	public String getServletInfo() {
+		return getClass().getCanonicalName();
+	}
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
+		try {
 
+			String uid = parseUid(request.getParameterValues("uid"));
+			if (uid == null || uid.trim().isEmpty()) {
+				throw new IllegalArgumentException("Empty username");
+			}
 
-        try {
+			String pass = parsePass(request.getParameterValues("pass"));
+			if (pass == null || pass.trim().isEmpty()) {
+				throw new IllegalArgumentException(
+						"Could not authenticate user '" + uid + "'");
+			}
 
-            String uid = parseUid(request.getParameterValues("uid"));
-            if (uid == null || uid.trim().isEmpty()) {
-                throw new IllegalArgumentException("Empty username");
-            }
+			String newpass = parseNewPasswdParams(request
+					.getParameterValues("newpass"));
+			if (newpass == null || newpass.trim().isEmpty()) {
+				throw new IllegalArgumentException(
+						"New passwords don't match or are empty");
+			}
 
-            String pass = parsePass(request.getParameterValues("pass"));
-            if (pass == null || pass.trim().isEmpty()) {
-                throw new IllegalArgumentException("Could not authenticate user '" + uid + "'");
-            }
+			updateUserPassword(uid, pass, newpass);
+			writeResponse(response, request, uid);
+		} catch (IllegalArgumentException iae) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+					iae.getMessage());
+		} catch (RuntimeException re) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					re.getMessage());
+			logger.log(Level.INFO, null, re);
+		}
 
-            String newpass = parseNewPasswdParams(request.getParameterValues("newpass"));
-            if (newpass == null || newpass.trim().isEmpty()) {
-                throw new IllegalArgumentException("New passwords don't match or are empty");
-            }
+	}
 
-            updateUserPassword(uid, pass, newpass);
-            writeResponse(response, request, uid);
-        } catch (IllegalArgumentException iae) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, iae.getMessage());
-        } catch (RuntimeException re) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, re.getMessage());
-            logger.log(Level.INFO, null, re);
-        }
+	private void writeResponse(HttpServletResponse response,
+			HttpServletRequest request, String uid) throws IOException {
+		response.setContentType("text/html;charset=UTF-8");
 
-    }
+		PrintWriter out = response.getWriter();
 
-    private void writeResponse(HttpServletResponse response, HttpServletRequest request, String uid) throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
+		try {
+			out.println("<html>");
+			out.println("<head>");
+			out.println("<title>Servlet PasswdServlet</title>");
+			out.println("</head>");
+			out.println("<body>");
+			out.println("<h1>New password set for uid=" + uid + "</h1>");
+			out.println("</body>");
+			out.println("</html>");
+		} finally {
+			out.close();
+		}
 
-        PrintWriter out = response.getWriter();
+	}
 
-        try {
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet PasswdServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>New password set for uid=" + uid + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        } finally {
-            out.close();
-        }
+	private void updateUserPassword(String uid, String pass, String newpass) {
 
-    }
+		try {
 
-    private void updateUserPassword(String uid, String pass, String newpass) {
+			LdapCtxClient lctx = new LdapCtxClient();
 
-        try {
+			String uidDn = lctx.lookupUidDn(uid, pass);
 
-            LdapCtxClient lctx = new LdapCtxClient();
+			if (uidDn != null) {
+			} else {
+				logger.log(Level.INFO, "DN not found for uid={0}", uid);
+				throw new IllegalArgumentException(
+						"Could not authenticate user '" + uid + "'");
+			}
 
-            String uidDn = lctx.lookupUidDn(uid, pass);
+			lctx.updateLdapPassword(uidDn, newpass);
 
-            if (uidDn != null) {
-            } else {
-                logger.log(Level.INFO, "DN not found for uid={0}", uid);
-                throw new IllegalArgumentException("Could not authenticate user '" + uid + "'");
-            }
+			lctx.close();
 
-            lctx.updateLdapPassword(uidDn, newpass);
+		} catch (NamingException ex) {
+			logger.log(Level.SEVERE, null, ex);
+			throw new RuntimeException("Internal server error", ex);
+		} catch (NoSuchAlgorithmException ex) {
+			logger.log(Level.SEVERE, null, ex);
+			throw new RuntimeException("Internal server error", ex);
+		} catch (UnsupportedEncodingException ex) {
+			logger.log(Level.SEVERE, null, ex);
+			throw new RuntimeException("Internal server error", ex);
+		} catch (IOException ex) {
+			logger.log(Level.SEVERE, null, ex);
+			throw new RuntimeException("Internal server error", ex);
+		}
 
-            lctx.close();
+	}
 
-        } catch (NamingException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Internal server error", ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Internal server error", ex);
-        } catch (UnsupportedEncodingException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Internal server error", ex);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Internal server error", ex);
-        }
+	// Parameters
+	private String parseUid(String[] _uid) {
+		String uid = null;
+		if (_uid.length == 1) {
+			uid = _uid[0];
+		}
+		return uid;
+	}
 
-    }
+	private String parsePass(String[] _pass) {
+		return parseUid(_pass);
+	}
 
-    //Parameters
-    private String parseUid(String[] _uid) {
-        String uid = null;
-        if (_uid.length == 1) {
-            uid = _uid[0];
-        }
-        return uid;
-    }
-
-    private String parsePass(String[] _pass) {
-        return parseUid(_pass);
-    }
-
-    private String parseNewPasswdParams(String[] _newpass) {
-        String newpass = null;
-        Set<String> set = new HashSet<String>();
-        if (_newpass.length == 2) {
-            set.addAll(Arrays.asList(_newpass));
-        }
-        if (set.size() == 1) {
-            newpass = (String) set.toArray()[0];
-        } else {
-            logger.log(Level.FINE, "passwords don't match");
-        }
-        return newpass;
-    }
+	private String parseNewPasswdParams(String[] _newpass) {
+		String newpass = null;
+		Set<String> set = new HashSet<String>();
+		if (_newpass.length == 2) {
+			set.addAll(Arrays.asList(_newpass));
+		}
+		if (set.size() == 1) {
+			newpass = (String) set.toArray()[0];
+		} else {
+			logger.log(Level.FINE, "passwords don't match");
+		}
+		return newpass;
+	}
 }

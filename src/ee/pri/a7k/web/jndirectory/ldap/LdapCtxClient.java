@@ -21,62 +21,74 @@ import javax.naming.ldap.LdapContext;
 import javax.xml.bind.DatatypeConverter;
 
 /**
- *
+ * 
  * @author andrus
  */
 public class LdapCtxClient {
 
-    private final static Logger LOGGER = Logger.getLogger(LdapCtxClient.class.getName());
-    private final LdapContext lctx;
+	private final static Logger LOGGER = Logger.getLogger(LdapCtxClient.class
+			.getName());
+	private final LdapContext lctx;
 
-    public LdapCtxClient() throws NamingException, IOException {
-        lctx = LdapContextFactory.getContext();
-    }
+	public LdapCtxClient() throws NamingException, IOException {
+		lctx = LdapContextFactory.getContext();
+	}
 
-    public String lookupUidDn(String uid, String pass) throws NoSuchAlgorithmException, UnsupportedEncodingException, NamingException {
-        String uidDn = null;
+	public String lookupUidDn(String uid, String pass)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException,
+			NamingException {
+		String uidDn = null;
 
-        SearchControls sc = new SearchControls();
-        sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        String[] attributeFilter = {"cn"};
-        sc.setReturningAttributes(attributeFilter);
+		SearchControls sc = new SearchControls();
+		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		String[] attributeFilter = { "cn" };
+		sc.setReturningAttributes(attributeFilter);
 
-        NamingEnumeration results = lctx.search("ou=People",
-                "(&(objectClass=uidObject)(objectClass=simpleSecurityObject)(uid=" + uid + ")(userPassword=" + hashPassword(pass) + "))", sc);
+		NamingEnumeration<SearchResult> results = lctx.search("ou=People",
+				"(&(objectClass=uidObject)(objectClass=simpleSecurityObject)(uid="
+						+ uid + ")(userPassword=" + hashPassword(pass) + "))",
+				sc);
 
-        while (results.hasMore()) {
-            SearchResult sr = (SearchResult) results.next();
-            if (uidDn == null) {
-                uidDn = sr.getName() + ",ou=People";
-            } else {
-                LOGGER.log(Level.SEVERE, "Error getting multiple dns for uid: {0}", uid);
-                break;
-            }
+		while (results.hasMore()) {
+			SearchResult sr = results.next();
+			if (uidDn == null) {
+				uidDn = sr.getName() + ",ou=People";
+			} else {
+				LOGGER.log(Level.SEVERE,
+						"Error getting multiple dns for uid: {0}", uid);
+				break;
+			}
 
-        }
+		}
 
-        return uidDn;
-    }
+		return uidDn;
+	}
 
-    public void updateLdapPassword(String uidDn, String newpass) throws IllegalArgumentException, UnsupportedEncodingException, NoSuchAlgorithmException, NamingException {
-        ModificationItem[] mods = {new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", hashPassword(newpass)))};
-        lctx.modifyAttributes(uidDn, mods);
-        LOGGER.log(Level.INFO, "Password successfully changed for {0}", uidDn);
-    }
+	public void updateLdapPassword(String uidDn, String newpass)
+			throws IllegalArgumentException, UnsupportedEncodingException,
+			NoSuchAlgorithmException, NamingException {
+		ModificationItem[] mods = { new ModificationItem(
+				DirContext.REPLACE_ATTRIBUTE, new BasicAttribute(
+						"userPassword", hashPassword(newpass))) };
+		lctx.modifyAttributes(uidDn, mods);
+		LOGGER.log(Level.INFO, "Password successfully changed for {0}", uidDn);
+	}
 
-    private String hashPassword(String plain) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest md = MessageDigest.getInstance("SHA");
-        md.update(plain.getBytes("UTF-8"));
-        return "{SHA}" + DatatypeConverter.printBase64Binary(md.digest());
-    }
+	private String hashPassword(String plain) throws NoSuchAlgorithmException,
+			UnsupportedEncodingException {
+		MessageDigest md = MessageDigest.getInstance("SHA");
+		md.update(plain.getBytes("UTF-8"));
+		return "{SHA}" + DatatypeConverter.printBase64Binary(md.digest());
+	}
 
-    public void close() {
-        if (lctx != null) {
-            try {
-                lctx.close();
-            } catch (NamingException ex) {
-                Logger.getLogger(LdapCtxClient.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
+	public void close() {
+		if (lctx != null) {
+			try {
+				lctx.close();
+			} catch (NamingException ex) {
+				Logger.getLogger(LdapCtxClient.class.getName()).log(
+						Level.SEVERE, null, ex);
+			}
+		}
+	}
 }

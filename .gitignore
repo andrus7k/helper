@@ -1,1 +1,7 @@
 /target/
+/lib/
+/.classpath
+/.idea/
+/.project
+/build/
+
