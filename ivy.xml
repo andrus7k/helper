@@ -14,7 +14,6 @@
 		<dependency org="junit" name="junit" rev="4.+" conf="test->default"/>
 		<dependency org="org.jvnet.hudson.winstone" name="winstone" rev="+" conf="standalone->default"/>
 		
-		<dependency org="com.google.gwt" name="gwt-servlet" rev="2.4.+" conf="runtime->default"/>
 		<dependency org="com.google.gwt" name="gwt-user" rev="2.4.+" conf="compile->default"/>
 		<dependency org="com.google.gwt" name="gwt-dev" rev="2.4.+" conf="compile->default"/>
 	</dependencies>
