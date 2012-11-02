@@ -23,7 +23,7 @@
   ~ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   -->
 
-<project xmlns:ivy="antlib:org.apache.ivy.ant">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="build">
     <description>General ant build script</description>
 
     <!--GET IVY-->
