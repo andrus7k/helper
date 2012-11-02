@@ -1,6 +1,7 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="jnDirectory"
          default="standalone">
-    <include file="helper/build.xml" as="hlpr"/>
+    <include file="helper/ant/build.xml"/>
+    <include file="helper/ant/gwt.xml"/>
 
     <property name="src.dir" value="src"/>
     <property name="war.dir" value="war"/>
@@ -19,7 +20,7 @@
         <delete dir="${lib.dir}"/>
     </target>
 
-    <target name="compile" depends="hlpr.ivy-init">
+    <target name="compile" depends="build.ivy-init">
         <ivy:retrieve conf="compile" sync="true"/>
         <mkdir dir="${classes}"/>
         <javac srcdir="${src.dir}" destdir="${classes}" classpathref="classpath"/>
