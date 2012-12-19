@@ -19,10 +19,10 @@
         <delete dir="${lib.dir}"/>
     </target>
 
-    <target name="compile" depends="build.compile"/>
+    <target name="compile" depends="build.compile">
+    </target>
 
     <target name="compile-tests" depends="compile">
-        <ivy:retrieve conf="test" sync="true"/>
     </target>
 
     <target name="test" depends="compile-tests">
