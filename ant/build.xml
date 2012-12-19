@@ -26,7 +26,7 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="build">
     <description>General ant build script</description>
 
-    <!--GET IVY-->
+    <!-- IVY -->
     <property name="ivy.jar.version" value="2.2.0"/>
     <property name="ivy.jar.name" value="ivy-${ivy.jar.version}.jar"/>
     <property name="ivy.home" value="${user.home}/.ivy2"/>
@@ -43,6 +43,7 @@
                  classpath="${ivy.home}/${ivy.jar.name}"/>
         <ivy:resolve/>
     </target>
+    <!-- /IVY -->
 
     <property name="src.dir" location="src"/>
     <property name="test.dir" location="test"/>

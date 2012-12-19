@@ -24,11 +24,25 @@
   -->
 
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="gwt">
-    <include file="build.xml"/>
     <description>GWT compilation ant build script</description>
-    <target name="compile" depends="build.ivy-init">
-        <ivy:retrieve conf="compile" sync="true"/>
-        <mkdir dir="${classes}"/>
-        <javac srcdir="${src.dir}" destdir="${classes}" classpathref="classpath"/>
+    <include file="build.xml"/>
+    <target name="compile-gwt" description="GWT compile to JavaScript (production mode)">
+        <copy todir="${build.dir}/war" overwrite="true">
+            <fileset dir="${basedir}/war"/>
+        </copy>
+        <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+            <classpath>
+                <path refid="classpath"/>
+                <pathelement location="${classes}"/>
+                <pathelement location="${src.dir}"/>
+            </classpath>
+            <!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+            <jvmarg value="-Xmx256M"/>
+            <arg line="-war"/>
+            <arg value="${build.dir}/war"/>
+            <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+            <arg line="${gwt.args}"/>
+            <arg value="ee.hardsport.site.ui.index"/>
+        </java>
     </target>
 </project>
