@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <title>CWSS Calculator</title>
+    <script type="text/javascript"><!--
+    var duplicates = {
+        'asc':['asc1', 'asc2'],
+        'bsc':['bsc1', 'bsc2'],
+        'esc':['esc1', 'esc2'],
+        'total':['total1', 'total2']
+    };
+
+    function updateQuantified(id) {
+        document.getElementById(id + '_q').value = document.getElementById(id + '_v').value;
+        calcCWSS();
+    }
+
+    function toggleQuantified(elem) {
+        if (elem != null) {
+            if (document.getElementById(elem.id + '_q').selected) {
+                document.getElementById(elem.id + '_v').style.display = 'inline';
+            } else {
+                document.getElementById(elem.id + '_v').style.display = 'none';
+            }
+        }
+        calcCWSS();
+    }
+
+    function updateScore(id, val) {
+        document.getElementById(id).innerHTML = val.toFixed(2);
+        updateDuplicates(id, val);
+    }
+
+    function updateDuplicates(id, val) {
+        var dups = duplicates[id];
+        if (dups !== undefined)
+            for (var d in dups) {
+                updateScore(dups[d], val);
+            }
+    }
+
+    function calcBSC() {
+        var TI = document.getElementById('ti').value;
+        var AP = document.getElementById('ap').value;
+        var AL = document.getElementById('al').value;
+        var IC = document.getElementById('ic').value;
+        var FC = document.getElementById('fc').value;
+        var bsc = (10 * TI + 5 * AP + 5 * AL + 5 * FC) * (TI == 0 ? 0 : 1) * IC * 4.0;
+        updateScore('bsc', bsc);
+        return bsc;
+    }
+
+    function calcASC() {
+        var RP = document.getElementById('rp').value;
+        var RL = document.getElementById('rl').value;
+        var AV = document.getElementById('av').value;
+        var AS = document.getElementById('as').value;
+        var AI = document.getElementById('ai').value;
+        var IN = document.getElementById('in').value;
+        var SC = document.getElementById('sc').value;
+        var asc = (20 * RP + 20 * RL + 20 * AV + 20 * SC + 10 * IN + 5 * AS + 5 * AI) / 100.0;
+        updateScore('asc', asc);
+        return asc;
+    }
+
+    function calcESC() {
+        var BI = document.getElementById('bi').value;
+        var DI = document.getElementById('di').value;
+        var EX = document.getElementById('ex').value;
+        var EC = document.getElementById('ec').value;
+        var RE = document.getElementById('re').value;
+        var P = document.getElementById('p').value;
+        var esc = ((10 * BI + 3 * DI + 3 * EX + 3 * P + 1 * RE) * (BI == 0 ? 0 : 1) * EC) / 20.0;
+        updateScore('esc', esc);
+        return esc;
+    }
+
+    function calcCWSS() {
+        var bsc = calcBSC();
+        var asc = calcASC();
+        var esc = calcESC();
+        var total = (bsc * asc * esc);
+        updateScore('total', total);
+    }
+    //-->
+    </script>
+</head>
+<body onload="calcCWSS();">
+<h1>CWSS Score <span id="total" style="color: red; font-weight: bold;"></span></h1>
+
+<h3>Base Finding Metric Group <span id="bsc" style="color: red; font-weight: bold;"></span></h3>
+<table>
+    <tr>
+        <td>Technical Impact (TI)</td>
+        <td>
+            <select id="ti" onchange="toggleQuantified(this);">
+                <option value="1.0">Critical</option>
+                <option value="0.9">High</option>
+                <option value="0.6">Medium</option>
+                <option value="0.3">Low</option>
+                <option value="0.0">None</option>
+                <option value="0.6" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="ti_q" value="0.6">Quantified</option>
+            </select>
+            <input id="ti_v" style="display:none;" type="text" onchange="updateQuantified('ti');" value="0.6">
+        </td>
+    </tr>
+    <tr>
+        <td>Acquired Privilege (AP)</td>
+        <td>
+            <select id="ap" onchange="calcCWSS();">
+                <option value="1.0">Administrator</option>
+                <option value="0.9">Partially-Privileged User</option>
+                <option value="0.7">Regular User</option>
+                <option value="0.6">Guest</option>
+                <option value="0.1">None</option>
+                <option value="0.7" selected>Default</option>
+                <option value="1.0">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Acquired Privilege Layer (AL)</td>
+        <td>
+            <select id="al" onchange="calcCWSS();">
+                <option value="1.0">Application</option>
+                <option value="0.9">System</option>
+                <option value="0.7">Network</option>
+                <option value="1.0">Enterprise</option>
+                <option value="0.9" selected>Default</option>
+                <option value="0.6">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Internal Control Effectiveness (IC)</td>
+        <td>
+            <select id="ic" onchange="calcCWSS();">
+                <option value="1.0">None</option>
+                <option value="0.9">Limited</option>
+                <option value="0.7">Moderate</option>
+                <option value="0.5">Indirect (Defense-in-Depth)</option>
+                <option value="0.3">Best-Available</option>
+                <option value="0.0">Complete</option>
+                <option value="0.6" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Finding Confidence (FC)</td>
+        <td>
+            <select id="fc" onchange="toggleQuantified(this);">
+                <option value="1.0">Proven True</option>
+                <option value="0.8">Proven Locally True</option>
+                <option value="0.0">Proven False</option>
+                <option value="0.8" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="fc_q" value="0.8">Quantified</option>
+            </select>
+            <input id="fc_v" style="display:none;" type="text" onchange="updateQuantified('fc');"
+                   value="0.8">
+        </td>
+    </tr>
+</table>
+<h3>Attack Surface Metric Group <span id="asc" style="color: red; font-weight: bold;"></span></h3>
+<table>
+    <tr>
+        <td>Required Privilege (RP)</td>
+        <td>
+            <select id="rp" onchange="calcCWSS();">
+                <option value="1.0">None</option>
+                <option value="0.9">Guest</option>
+                <option value="0.7">Regular User</option>
+                <option value="0.6">Partially-Privileged User</option>
+                <option value="0.1">Administrator</option>
+                <option value="0.7" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Required Privilege Layer (RL)</td>
+        <td>
+            <select id="rl" onchange="calcCWSS();">
+                <option value="0.9">System</option>
+                <option value="1.0">Application</option>
+                <option value="0.7">Network</option>
+                <option value="1.0">Enterprise</option>
+                <option value="0.9" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Access Vector (AV)</td>
+        <td>
+            <select id="av" onchange="calcCWSS();">
+                <option value="1.0">Internet</option>
+                <option value="0.8">Intranet</option>
+                <option value="0.8">Private Network</option>
+                <option value="0.7">Adjacent Network</option>
+                <option value="0.5">Local</option>
+                <option value="0.2">Physical</option>
+                <option value="0.75" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Authentication Strength (AS)</td>
+        <td>
+            <select id="as" onchange="calcCWSS();">
+                <option value="0.7">Strong</option>
+                <option value="0.8">Moderate</option>
+                <option value="0.9">Weak</option>
+                <option value="1.0">None</option>
+                <option value="0.85" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Authentication Instances (AI)</td>
+        <td>
+            <select id="ai" onchange="calcCWSS();">
+                <option value="1.0">None</option>
+                <option value="0.8">Single</option>
+                <option value="0.5">Multiple</option>
+                <option value="0.8" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Level of Interaction (IN)</td>
+        <td>
+            <select id="in" onchange="calcCWSS();">
+                <option value="1.0">Automated</option>
+                <option value="0.9">Limited/Typical</option>
+                <option value="0.8">Moderate</option>
+                <option value="0.3">Opportunistic</option>
+                <option value="0.1">High</option>
+                <option value="0.0">No interaction</option>
+                <option value="0.55" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Deployment Scope (SC)</td>
+        <td>
+            <select id="sc" onchange="toggleQuantified(this);">
+                <option value="1.0">All</option>
+                <option value="0.9">Moderate</option>
+                <option value="0.5">Rare</option>
+                <option value="0.1">Potentially Reachable</option>
+                <option value="0.7" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="sc_q" value="0.7">Quantified</option>
+            </select>
+            <input id="sc_v" style="display:none;" type="text" onchange="updateQuantified('sc');"
+                   value="0.7">
+        </td>
+    </tr>
+</table>
+<h3>Environmental Metric Group <span id="esc" style="color: red; font-weight: bold;"></span></h3>
+<table>
+    <tr>
+        <td>Business Impact (BI)</td>
+        <td>
+            <select id="bi" onchange="toggleQuantified(this);">
+                <option value="1.0">Critical</option>
+                <option value="0.9">High</option>
+                <option value="0.6">Medium</option>
+                <option value="0.3">Low</option>
+                <option value="0.0">None</option>
+                <option value="0.6" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option id="bi_q" value="0.6">Quantified</option>
+            </select>
+            <input id="bi_v" style="display:none;" type="text" onchange="updateQuantified('bi');"
+                   value="0.6">
+        </td>
+    </tr>
+    <tr>
+        <td>Likelihood of Discovery (DI)</td>
+        <td>
+            <select id="di" onchange="toggleQuantified(this);">
+                <option value="1.0">High</option>
+                <option value="0.6">Medium</option>
+                <option value="0.2">Low</option>
+                <option value="0.6" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="di_q" value="0.6">Quantified</option>
+            </select>
+            <input id="di_v" style="display:none;" type="text" onchange="updateQuantified('di');"
+                   value="0.6">
+        </td>
+    </tr>
+    <tr>
+        <td>Likelihood of Exploit (EX)</td>
+        <td>
+            <select id="ex" onchange="toggleQuantified(this);">
+                <option value="1.0">High</option>
+                <option value="0.6">Medium</option>
+                <option value="0.2">Low</option>
+                <option value="0.6" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="ex_q" value="0.6">Quantified</option>
+            </select>
+            <input id="ex_v" style="display:none;" type="text" onchange="updateQuantified('ex');"
+                   value="0.6">
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>External Control Effectiveness (EC)</td>
+        <td>
+            <select id="ec" onchange="calcCWSS();">
+                <option value="1.0">None</option>
+                <option value="0.9">Limited</option>
+                <option value="0.7">Moderate</option>
+                <option value="0.5">Indirect (Defense-in-Depth)</option>
+                <option value="0.3">Best-Available</option>
+                <option value="0.1">Complete</option>
+                <option value="0.6" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Remediation Effort (RE)</td>
+        <td>
+            <select id="re" onchange="toggleQuantified(this);">
+                <option value="1.0">Extensive</option>
+                <option value="0.9">Moderate</option>
+                <option value="0.8">Limited</option>
+                <option value="0.9" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="re_q" value="0.9">Quantified</option>
+            </select>
+            <input id="re_v" style="display:none;" type="text" onchange="updateQuantified('re');"
+                   value="0.9">
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Prevalence (P)</td>
+        <td>
+            <select id="p" onchange="toggleQuantified(this);">
+                <option value="1.0">Widespread</option>
+                <option value="0.9">High</option>
+                <option value="0.8">Common</option>
+                <option value="0.7">Limited</option>
+                <option value="0.85" selected>Default</option>
+                <option value="0.5">Unknown</option>
+                <option value="1.0">Not Applicable</option>
+                <option id="p_q" value="0.85">Quantified</option>
+            </select>
+            <input id="p_v" style="display:none;" type="text" onchange="updateQuantified('p');"
+                   value="0.85">
+            </select>
+        </td>
+    </tr>
+</table>
+<div>
+    <h1>CWSS Score <span id="total1" style="color: blue; font-weight: bold;"></span></h1>
+
+    <h3>Base Finding Metric Group <span id="bsc1" style="color: red; font-weight: bold;"></span></h3>
+
+    <h3>Attack Surface Metric Group <span id="asc1" style="color: yellow; font-weight: bold;"></span></h3>
+
+    <h3>Environmental Metric Group <span id="esc1" style="color: green; font-weight: bold;"></span></h3>
+</div>
+<div>
+    <h1>CWSS Score <span id="total2" style="color: blue; font-weight: bold;"></span></h1>
+
+    <h3>Base Finding Metric Group <span id="bsc2" style="color: red; font-weight: bold;"></span></h3>
+
+    <h3>Attack Surface Metric Group <span id="asc2" style="color: yellow; font-weight: bold;"></span></h3>
+
+    <h3>Environmental Metric Group <span id="esc2" style="color: green; font-weight: bold;"></span></h3>
+</div>
+</body>
+</html>
